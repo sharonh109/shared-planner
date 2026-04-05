@@ -410,7 +410,7 @@ function dk(d) {
   return `${y}-${m}-${day}`;
 }
 function addD(d,n) { const r=new Date(d); r.setDate(r.getDate()+n); return r; }
-function weekStart(o=0) { const n=new Date(),d=n.getDay(),m=new Date(n); m.setDate(n.getDate()-d+1+o*7); m.setHours(0,0,0,0); return m; }
+function weekStart(o=0) { const n=new Date(),d=n.getDay()||7,m=new Date(n); m.setDate(n.getDate()-d+1+o*7); m.setHours(0,0,0,0); return m; }
 function catById(id) { return S.categories.find(c=>c.id===id)||{name:'Other',color:'#bbb'}; }
 
 function repeatOK(task, date) {
