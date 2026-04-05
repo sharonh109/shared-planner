@@ -38,6 +38,7 @@
   .today-pill { background: var(--accent); color: #fff; font-size: 0.65rem; font-weight: 500; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase; }
   .day-add-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 2px 10px; font-size: 0.72rem; font-family: 'DM Sans', sans-serif; color: var(--muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
   .day-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .day-gif { width: 100%; max-height: 150px; object-fit: cover; display: block; border-bottom: 1px solid var(--border); }
   .day-body { padding: 0.8rem 1.2rem 1rem; min-height: 20px; }
 
   .category-block { margin-bottom: 0.9rem; }
@@ -183,6 +184,28 @@
   .recipe-menu-pop .rpop-delete { color: #d95f5f; }
   .recipe-menu-pop .rpop-delete:hover { background: #fdf0f0; }
 
+  .recipe-categories-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.2rem; align-items: center; }
+  .recipe-cat-pill { border: 1px solid var(--border); background: var(--surface); border-radius: 20px; padding: 0.3rem 0.9rem; font-size: 0.82rem; font-family: 'DM Sans', sans-serif; cursor: pointer; color: var(--text); transition: all 0.15s; white-space: nowrap; }
+  .recipe-cat-pill:hover { border-color: var(--accent); }
+  .recipe-cat-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .recipe-cat-manage-btn { border: 1px dashed var(--border); background: none; border-radius: 20px; padding: 0.3rem 0.7rem; font-size: 0.82rem; font-family: 'DM Sans', sans-serif; cursor: pointer; color: var(--muted); transition: all 0.15s; }
+  .recipe-cat-manage-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .recipe-tag { font-size: 0.72rem; background: var(--accent-light); color: var(--accent); padding: 2px 8px; border-radius: 10px; margin-right: 0.3rem; margin-bottom: 0.3rem; display: inline-block; }
+  .recipe-tags-row { margin-top: 0.4rem; margin-bottom: 0.2rem; }
+  .cat-checkbox-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem; }
+  .cat-checkbox-label { display: flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer; border: 1px solid var(--border); border-radius: 16px; padding: 0.25rem 0.7rem; transition: all 0.15s; user-select: none; }
+  .cat-checkbox-label:hover { border-color: var(--accent); }
+  .cat-checkbox-label.checked { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .cat-checkbox-label input { display: none; }
+  .cat-manage-list { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; max-height: 200px; overflow-y: auto; }
+  .cat-manage-item { display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0.6rem; border: 1px solid var(--border); border-radius: 10px; font-size: 0.85rem; }
+  .cat-manage-item button { background: none; border: none; cursor: pointer; color: #d95f5f; font-size: 0.85rem; padding: 0 0.3rem; }
+  .cat-manage-item button:hover { color: #b33; }
+  .cat-add-row { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
+  .cat-add-row input { flex: 1; border: 1px solid var(--border); border-radius: 10px; padding: 0.4rem 0.7rem; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; outline: none; }
+  .cat-add-row input:focus { border-color: var(--accent); }
+  .cat-add-row button { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 0.4rem 0.8rem; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+
   .recipes-empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
   .recipes-empty p { font-size: 0.95rem; margin-top: 0.5rem; }
 
@@ -263,6 +286,7 @@
       </div>
       <button class="add-recipe-btn" id="add-recipe-btn">+ Add Recipe</button>
     </div>
+    <div class="recipe-categories-bar" id="recipe-categories-bar"></div>
     <div id="recipe-list"></div>
     <div class="recipes-empty" id="recipes-empty" style="display:none">
       <div style="font-size:2.5rem">🍳</div>
@@ -283,9 +307,26 @@
     <label style="margin-top:0.5rem;display:block;">Instructions</label>
     <textarea id="recipe-instructions-input" rows="5" placeholder="e.g.&#10;Boil spaghetti until al dente&#10;Melt butter in a pan with minced garlic&#10;Add red pepper flakes&#10;Toss pasta in the garlic butter&#10;Finish with parmesan and parsley"></textarea>
     <div class="recipe-hint">One step per line</div>
+    <label style="margin-top:0.5rem;display:block;">Categories</label>
+    <div class="cat-checkbox-list" id="recipe-cat-checkboxes"></div>
     <div class="modal-actions">
       <button class="btn-cancel" id="recipe-modal-cancel">Cancel</button>
       <button class="btn-save" id="recipe-modal-save">Add Recipe</button>
+    </div>
+  </div>
+</div>
+
+<!-- Category manage modal -->
+<div class="modal-overlay" id="cat-manage-modal">
+  <div class="modal">
+    <h2>Manage Categories</h2>
+    <div class="cat-manage-list" id="cat-manage-list"></div>
+    <div class="cat-add-row">
+      <input type="text" id="cat-add-input" placeholder="New category name" maxlength="30">
+      <button id="cat-add-btn">Add</button>
+    </div>
+    <div class="modal-actions" style="margin-top:1rem;">
+      <button class="btn-save" id="cat-manage-close">Done</button>
     </div>
   </div>
 </div>
@@ -536,6 +577,22 @@ function renderBar() {
   b.onclick=()=>openCatModal(null); bar.appendChild(b);
 }
 
+const DAY_GIFS = [
+  // Cute cats
+  'oMckVmVfiQelxwhidB','bYbQRSIeqHyRq','7cCw9MoRByrk6L4EVz','kZrtVJy88do2c',
+  'CwVcpb0GQx4vbn24c0','YKLOQ03Qky7qE',
+  // Cute dogs
+  'lPiubg7wdpSE5o2Ocg','l41m47JypM5GUYSY0','yw6YcXlM895Nm',
+  '3oz8xXS6gDYSNbqme4','1QdPCv8Jv3EOG4qyQU','l3vR6Pi2E1ZyOl9AI',
+  'ccHoPDmvZpGpy','w40yQgSXwjOQo'
+];
+function gifForDay(dateKey) {
+  // Simple hash from date string so the same day always shows the same gif
+  let h = 0;
+  for (let i = 0; i < dateKey.length; i++) h = ((h << 5) - h + dateKey.charCodeAt(i)) | 0;
+  return DAY_GIFS[Math.abs(h) % DAY_GIFS.length];
+}
+
 function renderWeek() {
   const grid=document.getElementById('days-grid'); grid.innerHTML='';
   const ws=weekStart(weekOffset), we=addD(ws,6), today=dk(new Date());
@@ -560,6 +617,7 @@ function renderWeek() {
           <button class="day-add-btn" data-daykey="${key}">+ Add Task</button>
         </div>
       </div>
+      <img class="day-gif" src="https://media.giphy.com/media/${gifForDay(key)}/giphy.gif" alt="daily gif" loading="lazy">
       <div class="day-body" id="body-${key}"></div>
       <div class="day-footer">
         <div class="progress-bar-wrap"><div class="progress-bar" id="prog-${key}" style="width:0%"></div></div>
@@ -836,7 +894,7 @@ function switchTab(tab) {
   document.getElementById('panel-' + tab).classList.add('active');
   document.getElementById('manage-bar').style.display = tab === 'planner' ? '' : 'none';
   if (tab === 'goals') renderGoals();
-  if (tab === 'recipes') renderRecipes();
+  if (tab === 'recipes') { renderCategoryBar(); renderRecipes(); }
 }
 
 // ── Big Goals ─────────────────────────────────────────────────────────────────
@@ -938,7 +996,117 @@ document.getElementById('goal-modal-save').addEventListener('click', () => {
 
 // ── Recipes ──────────────────────────────────────────────────────────────────
 if (!S.recipes) S.recipes = [];
+if (!S.recipeCategories) S.recipeCategories = [];
 let editingRecipeId = null;
+let activeCategoryFilter = null;
+
+// ── Category management ─────────────────────────────────────────────────────
+function renderCategoryBar() {
+  const bar = document.getElementById('recipe-categories-bar');
+  const cats = S.recipeCategories || [];
+  bar.innerHTML = '';
+  if (cats.length === 0) {
+    const manageBtn = document.createElement('button');
+    manageBtn.className = 'recipe-cat-manage-btn';
+    manageBtn.textContent = '+ Categories';
+    manageBtn.addEventListener('click', openCatManageModal);
+    bar.appendChild(manageBtn);
+    return;
+  }
+
+  const allPill = document.createElement('button');
+  allPill.className = 'recipe-cat-pill' + (activeCategoryFilter === null ? ' active' : '');
+  allPill.textContent = 'All';
+  allPill.addEventListener('click', () => { activeCategoryFilter = null; renderCategoryBar(); renderRecipes(); });
+  bar.appendChild(allPill);
+
+  cats.forEach(cat => {
+    const pill = document.createElement('button');
+    pill.className = 'recipe-cat-pill' + (activeCategoryFilter === cat ? ' active' : '');
+    pill.textContent = cat;
+    pill.addEventListener('click', () => { activeCategoryFilter = activeCategoryFilter === cat ? null : cat; renderCategoryBar(); renderRecipes(); });
+    bar.appendChild(pill);
+  });
+
+  const manageBtn = document.createElement('button');
+  manageBtn.className = 'recipe-cat-manage-btn';
+  manageBtn.textContent = '✎';
+  manageBtn.addEventListener('click', openCatManageModal);
+  bar.appendChild(manageBtn);
+}
+
+function openCatManageModal() {
+  renderCatManageList();
+  document.getElementById('cat-manage-modal').classList.add('open');
+  document.getElementById('cat-add-input').value = '';
+  document.getElementById('cat-add-input').focus();
+}
+
+function renderCatManageList() {
+  const list = document.getElementById('cat-manage-list');
+  const cats = S.recipeCategories || [];
+  list.innerHTML = '';
+  cats.forEach(cat => {
+    const item = document.createElement('div');
+    item.className = 'cat-manage-item';
+    item.innerHTML = `<span>${cat}</span><button title="Delete category">✕</button>`;
+    item.querySelector('button').addEventListener('click', () => {
+      S.recipeCategories = S.recipeCategories.filter(c => c !== cat);
+      // Remove category from recipes that have it
+      (S.recipes || []).forEach(r => { if (r.categories) r.categories = r.categories.filter(c => c !== cat); });
+      if (activeCategoryFilter === cat) activeCategoryFilter = null;
+      saveState();
+      renderCatManageList();
+      renderCategoryBar();
+      renderRecipes();
+    });
+    list.appendChild(item);
+  });
+}
+
+document.getElementById('cat-add-btn').addEventListener('click', addCategory);
+document.getElementById('cat-add-input').addEventListener('keydown', e => { if (e.key === 'Enter') addCategory(); });
+
+function addCategory() {
+  const input = document.getElementById('cat-add-input');
+  const name = input.value.trim();
+  if (!name) return;
+  if (!S.recipeCategories) S.recipeCategories = [];
+  if (S.recipeCategories.some(c => c.toLowerCase() === name.toLowerCase())) { input.value = ''; return; }
+  S.recipeCategories.push(name);
+  saveState();
+  input.value = '';
+  renderCatManageList();
+  renderCategoryBar();
+}
+
+document.getElementById('cat-manage-close').addEventListener('click', () => document.getElementById('cat-manage-modal').classList.remove('open'));
+document.getElementById('cat-manage-modal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); });
+
+function renderCatCheckboxes(selectedCats) {
+  const container = document.getElementById('recipe-cat-checkboxes');
+  const cats = S.recipeCategories || [];
+  container.innerHTML = '';
+  if (cats.length === 0) {
+    container.innerHTML = '<span style="font-size:0.8rem;color:var(--muted)">No categories yet — manage them from the filter bar</span>';
+    return;
+  }
+  cats.forEach(cat => {
+    const label = document.createElement('label');
+    const isChecked = selectedCats.includes(cat);
+    label.className = 'cat-checkbox-label' + (isChecked ? ' checked' : '');
+    label.innerHTML = `<input type="checkbox" value="${cat}" ${isChecked ? 'checked' : ''}>${cat}`;
+    label.querySelector('input').addEventListener('change', function() {
+      label.classList.toggle('checked', this.checked);
+    });
+    container.appendChild(label);
+  });
+}
+
+function getSelectedCategories() {
+  const checks = document.querySelectorAll('#recipe-cat-checkboxes input[type="checkbox"]');
+  return Array.from(checks).filter(c => c.checked).map(c => c.value);
+}
 
 function parseRecipe(text) {
   const lines = text.trim().split(/\n/).map(l => l.trim()).filter(Boolean);
@@ -1047,8 +1215,11 @@ function renderRecipes() {
   const container = document.getElementById('recipe-list');
   const empty = document.getElementById('recipes-empty');
   container.innerHTML = '';
-  const recipes = S.recipes || [];
-  empty.style.display = recipes.length ? 'none' : 'block';
+  const allRecipes = S.recipes || [];
+  const recipes = activeCategoryFilter
+    ? allRecipes.filter(r => (r.categories || []).includes(activeCategoryFilter))
+    : allRecipes;
+  empty.style.display = allRecipes.length ? 'none' : 'block';
 
   recipes.forEach(recipe => {
     const card = document.createElement('div');
@@ -1071,8 +1242,14 @@ function renderRecipes() {
 
     let notesHtml = recipe.notes ? `<div class="recipe-notes">${recipe.notes}</div>` : '';
 
+    let tagsHtml = '';
+    if (recipe.categories && recipe.categories.length) {
+      tagsHtml = `<div class="recipe-tags-row">${recipe.categories.map(c => `<span class="recipe-tag">${c}</span>`).join('')}</div>`;
+    }
+
     card.innerHTML = `
       <div class="recipe-title">${recipe.title}</div>
+      ${tagsHtml}
       <div class="recipe-detail" style="display:none;">
         ${metaHtml ? `<div class="recipe-meta">${metaHtml}</div>` : ''}
         ${ingHtml}
@@ -1125,6 +1302,7 @@ function openRecipeModal(recipe) {
   document.getElementById('recipe-title-input').value = recipe ? (recipe.title || '') : '';
   document.getElementById('recipe-ingredients-input').value = recipe ? (recipe.ingredients || []).join('\n') : '';
   document.getElementById('recipe-instructions-input').value = recipe ? (recipe.instructions || []).join('\n') : '';
+  renderCatCheckboxes(recipe ? (recipe.categories || []) : []);
   document.getElementById('recipe-modal').classList.add('open');
   document.getElementById('recipe-title-input').focus();
 }
@@ -1141,7 +1319,8 @@ document.getElementById('recipe-modal-save').addEventListener('click', () => {
   const instructions = document.getElementById('recipe-instructions-input').value.trim()
     .split(/\n/).map(l => l.trim()).filter(Boolean);
 
-  const data = { title, ingredients, instructions };
+  const categories = getSelectedCategories();
+  const data = { title, ingredients, instructions, categories };
 
   if (editingRecipeId) {
     const r = S.recipes.find(r => r.id === editingRecipeId);
@@ -1172,6 +1351,7 @@ if (dbRef) {
       S = remote;
       if (!S.goals) S.goals = [];
       if (!S.recipes) S.recipes = [];
+      if (!S.recipeCategories) S.recipeCategories = [];
       if (!S.categories || !S.categories.length) S.categories = defaultState().categories;
       if (!S.repeatingTasks) S.repeatingTasks = [];
       if (!S.oneOffTasks) S.oneOffTasks = {};
