@@ -31,6 +31,7 @@
 
   .day-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
   .day-card.today { border-color: var(--accent); }
+  .day-card.past { opacity: 0.45; }
   .day-header { padding: 1rem 1.2rem 0.8rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
   .day-name { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; }
   .day-date { font-size: 0.78rem; color: var(--muted); font-weight: 300; }
@@ -469,9 +470,16 @@ function renderWeek() {
   document.getElementById('week-label').textContent=`${ws.getDate()} ${MONTHS[ws.getMonth()]} – ${we.getDate()} ${MONTHS[we.getMonth()]} ${we.getFullYear()}`;
   document.getElementById('header-sub').textContent=weekOffset===0?'This week':weekOffset===1?'Next week':weekOffset===-1?'Last week':'';
 
-  for(let i=0;i<7;i++){
+  // For current week, reorder: today first, then future days, then past days greyed out
+  const todayIdx = weekOffset===0 ? Array.from({length:7},(_,i)=>i).findIndex(i=>dk(addD(ws,i))===today) : -1;
+  const order = todayIdx>=0
+    ? [...Array.from({length:7-todayIdx},(_,i)=>todayIdx+i), ...Array.from({length:todayIdx},(_,i)=>i)]
+    : Array.from({length:7},(_,i)=>i);
+
+  for(const i of order){
     const date=addD(ws,i), key=dk(date), isTod=key===today;
-    const card=document.createElement('div'); card.className='day-card'+(isTod?' today':'');
+    const isPast = weekOffset===0 && i<todayIdx;
+    const card=document.createElement('div'); card.className='day-card'+(isTod?' today':'')+(isPast?' past':'');
     card.innerHTML=`
       <div class="day-header">
         <div><div class="day-name">${DAYS[date.getDay()]}</div><div class="day-date">${date.getDate()} ${MONTHS[date.getMonth()]}</div></div>
