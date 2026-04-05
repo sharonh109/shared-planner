@@ -156,6 +156,39 @@
 
   .goals-empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
   .goals-empty p { font-size: 0.95rem; margin-top: 0.5rem; }
+
+  /* Recipes */
+  .recipes-wrap { max-width: 780px; margin: 0 auto; }
+  .recipes-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.8rem; }
+  .recipes-header h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; }
+  .recipes-header p { color: var(--muted); font-size: 0.85rem; margin-top: 0.2rem; }
+  .add-recipe-btn { background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 0.55rem 1.2rem; font-size: 0.88rem; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; white-space: nowrap; }
+
+  .recipe-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.3rem 1.4rem; margin-bottom: 1rem; position: relative; transition: box-shadow 0.15s; }
+  .recipe-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.07); }
+  .recipe-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 0.6rem; }
+  .recipe-meta { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+  .recipe-meta-item { font-size: 0.78rem; color: var(--muted); background: var(--accent-light); padding: 2px 10px; border-radius: 12px; }
+  .recipe-section-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--accent); font-weight: 500; margin: 0.8rem 0 0.3rem; }
+  .recipe-ingredients { list-style: disc; padding-left: 1.3rem; font-size: 0.85rem; line-height: 1.6; color: var(--text); }
+  .recipe-instructions { list-style: decimal; padding-left: 1.3rem; font-size: 0.85rem; line-height: 1.7; color: var(--text); }
+  .recipe-instructions li { margin-bottom: 0.3rem; }
+  .recipe-notes { font-size: 0.82rem; color: var(--muted); font-style: italic; margin-top: 0.5rem; line-height: 1.5; }
+  .recipe-menu-btn { position: absolute; top: 1rem; right: 1rem; background: none; border: none; cursor: pointer; color: #bbb; font-size: 1.2rem; padding: 0 4px; opacity: 0; transition: opacity 0.15s; }
+  .recipe-card:hover .recipe-menu-btn, .recipe-menu-btn.open { opacity: 1; color: var(--muted); }
+  .recipe-menu-pop { position: absolute; right: 8px; top: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); z-index: 50; overflow: hidden; min-width: 110px; display: none; }
+  .recipe-menu-pop.open { display: block; }
+  .recipe-menu-pop button { display: block; width: 100%; text-align: left; background: none; border: none; cursor: pointer; padding: 0.55rem 1rem; font-size: 0.83rem; font-family: 'DM Sans', sans-serif; color: var(--text); transition: background 0.12s; }
+  .recipe-menu-pop button:hover { background: var(--bg); }
+  .recipe-menu-pop .rpop-delete { color: #d95f5f; }
+  .recipe-menu-pop .rpop-delete:hover { background: #fdf0f0; }
+
+  .recipes-empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+  .recipes-empty p { font-size: 0.95rem; margin-top: 0.5rem; }
+
+  .modal textarea { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 0.65rem 0.8rem; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; outline: none; color: var(--text); resize: vertical; line-height: 1.6; }
+  .modal textarea:focus { border-color: var(--accent); }
+  .recipe-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem; line-height: 1.5; }
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,40,37,0.35); z-index: 100; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--surface); border-radius: 18px; padding: 2rem; width: min(420px, 94vw); box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
@@ -188,6 +221,7 @@
 <div class="tab-bar">
   <button class="tab-btn active" id="tab-planner">📅 Planner</button>
   <button class="tab-btn" id="tab-goals">🎯 Big Goals</button>
+  <button class="tab-btn" id="tab-recipes">🍳 Recipes</button>
 </div>
 
 <!-- Planner tab -->
@@ -215,6 +249,43 @@
     <div class="goals-empty" id="goals-empty" style="display:none">
       <div style="font-size:2.5rem">🎯</div>
       <p>No goals yet — what do you want to achieve?</p>
+    </div>
+  </div>
+</div>
+
+<!-- Recipes tab -->
+<div class="tab-panel" id="panel-recipes">
+  <div class="recipes-wrap">
+    <div class="recipes-header">
+      <div>
+        <h2>Recipes</h2>
+        <p>Your recipe collection</p>
+      </div>
+      <button class="add-recipe-btn" id="add-recipe-btn">+ Add Recipe</button>
+    </div>
+    <div id="recipe-list"></div>
+    <div class="recipes-empty" id="recipes-empty" style="display:none">
+      <div style="font-size:2.5rem">🍳</div>
+      <p>No recipes yet — describe one to get started!</p>
+    </div>
+  </div>
+</div>
+
+<!-- Recipe modal -->
+<div class="modal-overlay" id="recipe-modal">
+  <div class="modal">
+    <h2 id="recipe-modal-title">Add Recipe</h2>
+    <label>Title</label>
+    <input type="text" id="recipe-title-input" placeholder="e.g. Garlic Butter Pasta" style="width:100%;padding:0.55rem 0.7rem;border:1px solid var(--border);border-radius:10px;font-size:0.92rem;font-family:'DM Sans',sans-serif;margin-bottom:0.7rem;box-sizing:border-box;">
+    <label>Ingredients</label>
+    <textarea id="recipe-ingredients-input" rows="5" placeholder="e.g.&#10;400g spaghetti&#10;3 tbsp butter&#10;4 cloves garlic, minced&#10;Red pepper flakes&#10;Parmesan and parsley"></textarea>
+    <div class="recipe-hint">One ingredient per line</div>
+    <label style="margin-top:0.5rem;display:block;">Instructions</label>
+    <textarea id="recipe-instructions-input" rows="5" placeholder="e.g.&#10;Boil spaghetti until al dente&#10;Melt butter in a pan with minced garlic&#10;Add red pepper flakes&#10;Toss pasta in the garlic butter&#10;Finish with parmesan and parsley"></textarea>
+    <div class="recipe-hint">One step per line</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="recipe-modal-cancel">Cancel</button>
+      <button class="btn-save" id="recipe-modal-save">Add Recipe</button>
     </div>
   </div>
 </div>
@@ -319,6 +390,7 @@ function defaultState() {
     checked: {},
     counters: {},
     goals: [],
+    recipes: [],
   };
 }
 
@@ -755,6 +827,7 @@ if ('serviceWorker' in navigator) {
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 document.getElementById('tab-planner').addEventListener('click', () => switchTab('planner'));
 document.getElementById('tab-goals').addEventListener('click',   () => switchTab('goals'));
+document.getElementById('tab-recipes').addEventListener('click', () => switchTab('recipes'));
 
 function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -763,6 +836,7 @@ function switchTab(tab) {
   document.getElementById('panel-' + tab).classList.add('active');
   document.getElementById('manage-bar').style.display = tab === 'planner' ? '' : 'none';
   if (tab === 'goals') renderGoals();
+  if (tab === 'recipes') renderRecipes();
 }
 
 // ── Big Goals ─────────────────────────────────────────────────────────────────
@@ -835,9 +909,10 @@ function openGoalModal(goal) {
 }
 
 function closeAllMenus() {
-  document.querySelectorAll('.task-menu-pop.open, .goal-menu-pop.open').forEach(p => {
+  document.querySelectorAll('.task-menu-pop.open, .goal-menu-pop.open, .recipe-menu-pop.open').forEach(p => {
     p.classList.remove('open');
-    p.closest('li')?.querySelector('.task-menu-btn,.goal-menu-btn')?.classList.remove('open');
+    const parent = p.closest('li') || p.closest('.recipe-card');
+    parent?.querySelector('.task-menu-btn,.goal-menu-btn,.recipe-menu-btn')?.classList.remove('open');
   });
 }
 
@@ -861,9 +936,229 @@ document.getElementById('goal-modal-save').addEventListener('click', () => {
   renderGoals();
 });
 
+// ── Recipes ──────────────────────────────────────────────────────────────────
+if (!S.recipes) S.recipes = [];
+let editingRecipeId = null;
+
+function parseRecipe(text) {
+  const lines = text.trim().split(/\n/).map(l => l.trim()).filter(Boolean);
+  const fullText = text.trim();
+
+  // Extract title: first line, or text before a dash/colon, or first sentence
+  let title = '';
+  let body = fullText;
+
+  // Check if first line looks like a title (short, no quantities)
+  if (lines.length > 1 && lines[0].length < 80 && !/\d+\s*(g|oz|cup|tbsp|tsp|ml|lb|kg)\b/i.test(lines[0])) {
+    title = lines[0].replace(/^[-–—•*#]+\s*/, '').replace(/[:–—-]+$/, '').trim();
+    body = lines.slice(1).join('\n');
+  } else {
+    // Try to extract title from "Name — description" or "Name: description" pattern
+    const titleMatch = fullText.match(/^([^.!?\n]{3,50}?)[\s]*[—–\-:]\s/);
+    if (titleMatch) {
+      title = titleMatch[1].trim();
+      body = fullText.slice(titleMatch[0].length);
+    } else {
+      // Use first sentence as title
+      const sentMatch = fullText.match(/^(.+?)[.!]\s/);
+      title = sentMatch ? sentMatch[1].trim() : lines[0].slice(0, 50);
+      if (sentMatch) body = fullText.slice(sentMatch[0].length);
+    }
+  }
+
+  // Extract servings
+  let servings = '';
+  const servMatch = body.match(/serves?\s+(\d+[\s\-–to]*\d*)/i) || body.match(/(\d+)\s+servings?/i) || body.match(/for\s+(\d+)\s+people/i);
+  if (servMatch) servings = servMatch[1].replace(/\s*[-–]\s*/g, '-').replace(/\s*to\s*/g, '-');
+
+  // Extract time
+  let time = '';
+  const timeMatch = body.match(/(?:takes?\s+(?:about\s+)?|cook(?:ing)?\s+time[:\s]*|prep\s+time[:\s]*|ready\s+in\s+|total\s+time[:\s]*)(\d+[\s\-–to]*\d*)\s*(min(?:ute)?s?|hours?|hrs?)/i)
+    || body.match(/(\d+[\s\-–to]*\d*)\s*(min(?:ute)?s?|hours?|hrs?)\b/i);
+  if (timeMatch) time = timeMatch[1].replace(/\s*[-–]\s*/g, '-').replace(/\s*to\s*/g, '-') + ' ' + timeMatch[2];
+
+  // Extract ingredients — look for quantity patterns
+  const ingredientPatterns = /(?:^|\n|[,;.])\s*(\d+[\d\/\.\s]*(?:g|oz|cup|cups|tbsp|tsp|ml|l|lb|lbs|kg|bunch|clove|cloves|can|cans|piece|pieces|slice|slices|handful|pinch|dash|stick|sticks|head|heads|packet|packets|package|packages|block|medium|large|small|whole)s?\b[^,.;!\n]{2,60})/gi;
+  const ingredients = [];
+  let match;
+
+  // Also try line-by-line detection
+  const bodyLines = body.split(/\n/).map(l => l.trim()).filter(Boolean);
+  const instructionLines = [];
+  let inInstructions = false;
+
+  for (const line of bodyLines) {
+    const cleaned = line.replace(/^[-–—•*]+\s*/, '').replace(/^\d+[.)]\s*/, '');
+    const hasQty = /\d+\s*(?:g|oz|cups?|tbsp|tsp|ml|l|lb|lbs|kg)\b/i.test(cleaned);
+    const isIngredientLine = hasQty && cleaned.length < 80;
+    const isStepLine = /^(first|then|next|after|finally|meanwhile|step\s*\d|now\s)/i.test(cleaned)
+      || /\b(cook|bake|boil|fry|sauté|saute|simmer|roast|grill|mix|stir|add|pour|heat|preheat|combine|whisk|fold|drain|chop|dice|slice|season|serve|let\s+it|set\s+aside|remove|place|transfer|spread|layer|toss|garnish|finish|bring\s+to)\b/i.test(cleaned);
+
+    if (isIngredientLine && !inInstructions) {
+      ingredients.push(cleaned);
+    } else if (isStepLine || inInstructions) {
+      inInstructions = true;
+      instructionLines.push(cleaned);
+    } else if (cleaned.length > 10) {
+      instructionLines.push(cleaned);
+    }
+  }
+
+  // If no ingredients found line-by-line, extract from continuous text
+  if (ingredients.length === 0) {
+    const ingRegex = /(\d[\d\/\.\s]*(?:g|oz|cups?|tbsp|tsp|ml|l|lb|lbs|kg|bunch|cloves?|cans?|pieces?|slices?|handful|pinch|dash|sticks?|heads?|packets?|packages?|blocks?|medium|large|small|whole)\s+[\w\s'-]{2,40})/gi;
+    while ((match = ingRegex.exec(body)) !== null) {
+      let ing = match[1].trim();
+      // Clean trailing action words
+      ing = ing.replace(/\s+(and|then|until|in|on|with|into|from)$/i, '').trim();
+      if (ing && !ingredients.includes(ing)) ingredients.push(ing);
+    }
+  }
+
+  // Extract instructions from continuous text if not found line-by-line
+  let instructions = instructionLines;
+  if (instructions.length === 0) {
+    // Split continuous text into sentences as steps
+    const sentences = body.split(/(?<=[.!])\s+/).filter(s => s.length > 10);
+    instructions = sentences.filter(s =>
+      /\b(cook|bake|boil|fry|sauté|saute|simmer|roast|grill|mix|stir|add|pour|heat|preheat|combine|whisk|fold|drain|chop|dice|slice|season|serve|let|set|remove|place|transfer|spread|layer|toss|garnish|finish|bring|melt|beat|knead|roll|cut)\b/i.test(s)
+    ).map(s => s.replace(/^\s*[-–—•*]+\s*/, '').replace(/^\d+[.)]\s*/, '').trim());
+  }
+
+  // Clean up instructions - remove meta info lines
+  instructions = instructions.filter(s =>
+    !/^serves?\s+\d/i.test(s) &&
+    !/^(?:takes?|total|prep|cook(?:ing)?)\s+(?:time|about)/i.test(s) &&
+    s.length > 5
+  ).map(s => {
+    // Remove trailing time/serving info from last step
+    return s.replace(/[,.]\s*serves?\s+\d.*$/i, '').replace(/[,.]\s*takes?\s+(?:about\s+)?\d.*$/i, '').trim();
+  });
+
+  // Extract notes — anything that doesn't fit elsewhere
+  let notes = '';
+  const noteMatch = body.match(/(?:note|tip|variation|optional)[s:]*\s*(.+)/i);
+  if (noteMatch) notes = noteMatch[1].trim();
+
+  return { title, ingredients, instructions, servings, time, notes };
+}
+
+function renderRecipes() {
+  const container = document.getElementById('recipe-list');
+  const empty = document.getElementById('recipes-empty');
+  container.innerHTML = '';
+  const recipes = S.recipes || [];
+  empty.style.display = recipes.length ? 'none' : 'block';
+
+  recipes.forEach(recipe => {
+    const card = document.createElement('div');
+    card.className = 'recipe-card';
+    card.style.cursor = 'pointer';
+
+    let metaHtml = '';
+    if (recipe.servings) metaHtml += `<span class="recipe-meta-item">Serves ${recipe.servings}</span>`;
+    if (recipe.time) metaHtml += `<span class="recipe-meta-item">${recipe.time}</span>`;
+
+    let ingHtml = '';
+    if (recipe.ingredients && recipe.ingredients.length) {
+      ingHtml = `<div class="recipe-section-label">Ingredients</div><ul class="recipe-ingredients">${recipe.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>`;
+    }
+
+    let stepsHtml = '';
+    if (recipe.instructions && recipe.instructions.length) {
+      stepsHtml = `<div class="recipe-section-label">Instructions</div><ol class="recipe-instructions">${recipe.instructions.map(s => `<li>${s}</li>`).join('')}</ol>`;
+    }
+
+    let notesHtml = recipe.notes ? `<div class="recipe-notes">${recipe.notes}</div>` : '';
+
+    card.innerHTML = `
+      <div class="recipe-title">${recipe.title}</div>
+      <div class="recipe-detail" style="display:none;">
+        ${metaHtml ? `<div class="recipe-meta">${metaHtml}</div>` : ''}
+        ${ingHtml}
+        ${stepsHtml}
+        ${notesHtml}
+      </div>
+      <button class="recipe-menu-btn">⋯</button>
+      <div class="recipe-menu-pop">
+        <button class="rpop-edit">✎ Edit</button>
+        <button class="rpop-delete">✕ Delete</button>
+      </div>`;
+
+    card.addEventListener('click', e => {
+      if (e.target.closest('.recipe-menu-btn') || e.target.closest('.recipe-menu-pop')) return;
+      const detail = card.querySelector('.recipe-detail');
+      detail.style.display = detail.style.display === 'none' ? '' : 'none';
+    });
+
+    const menuBtn = card.querySelector('.recipe-menu-btn');
+    const menuPop = card.querySelector('.recipe-menu-pop');
+    menuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const isOpen = menuPop.classList.contains('open');
+      closeAllMenus();
+      if (!isOpen) { menuPop.classList.add('open'); menuBtn.classList.add('open'); }
+    });
+
+    card.querySelector('.rpop-edit').addEventListener('click', e => {
+      e.stopPropagation();
+      closeAllMenus();
+      openRecipeModal(recipe);
+    });
+
+    card.querySelector('.rpop-delete').addEventListener('click', e => {
+      e.stopPropagation();
+      closeAllMenus();
+      S.recipes = S.recipes.filter(r => r.id !== recipe.id);
+      saveState();
+      renderRecipes();
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function openRecipeModal(recipe) {
+  editingRecipeId = recipe ? recipe.id : null;
+  document.getElementById('recipe-modal-title').textContent = recipe ? 'Edit Recipe' : 'Add Recipe';
+  document.getElementById('recipe-modal-save').textContent  = recipe ? 'Save Changes' : 'Add Recipe';
+  document.getElementById('recipe-title-input').value = recipe ? (recipe.title || '') : '';
+  document.getElementById('recipe-ingredients-input').value = recipe ? (recipe.ingredients || []).join('\n') : '';
+  document.getElementById('recipe-instructions-input').value = recipe ? (recipe.instructions || []).join('\n') : '';
+  document.getElementById('recipe-modal').classList.add('open');
+  document.getElementById('recipe-title-input').focus();
+}
+
+document.getElementById('add-recipe-btn').addEventListener('click', () => openRecipeModal(null));
+document.getElementById('recipe-modal-cancel').addEventListener('click', () => document.getElementById('recipe-modal').classList.remove('open'));
+document.getElementById('recipe-modal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); });
+document.getElementById('recipe-modal-save').addEventListener('click', () => {
+  const title = document.getElementById('recipe-title-input').value.trim();
+  if (!title) { document.getElementById('recipe-title-input').focus(); return; }
+
+  const ingredients = document.getElementById('recipe-ingredients-input').value.trim()
+    .split(/\n/).map(l => l.trim()).filter(Boolean);
+  const instructions = document.getElementById('recipe-instructions-input').value.trim()
+    .split(/\n/).map(l => l.trim()).filter(Boolean);
+
+  const data = { title, ingredients, instructions };
+
+  if (editingRecipeId) {
+    const r = S.recipes.find(r => r.id === editingRecipeId);
+    if (r) Object.assign(r, data);
+  } else {
+    if (!S.recipes) S.recipes = [];
+    S.recipes.push({ id: 'rec' + Date.now(), ...data });
+  }
+  saveState();
+  document.getElementById('recipe-modal').classList.remove('open');
+  renderRecipes();
+});
+
 // ── Boot ──────────────────────────────────────────────────────────────────────
 // Render immediately from local data so the page isn't blank
 if (!S.goals) S.goals = [];
+if (!S.recipes) S.recipes = [];
 if (!S.categories || !S.categories.length) S.categories = defaultState().categories;
 renderBar();
 renderWeek();
@@ -876,6 +1171,7 @@ if (dbRef) {
     if (remote && typeof remote === 'object') {
       S = remote;
       if (!S.goals) S.goals = [];
+      if (!S.recipes) S.recipes = [];
       if (!S.categories || !S.categories.length) S.categories = defaultState().categories;
       if (!S.repeatingTasks) S.repeatingTasks = [];
       if (!S.oneOffTasks) S.oneOffTasks = {};
