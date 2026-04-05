@@ -586,11 +586,23 @@ const DAY_GIFS = [
   '3oz8xXS6gDYSNbqme4','1QdPCv8Jv3EOG4qyQU','l3vR6Pi2E1ZyOl9AI',
   'ccHoPDmvZpGpy','w40yQgSXwjOQo'
 ];
-function gifForDay(dateKey) {
-  // Simple hash from date string so the same day always shows the same gif
-  let h = 0;
-  for (let i = 0; i < dateKey.length; i++) h = ((h << 5) - h + dateKey.charCodeAt(i)) | 0;
-  return DAY_GIFS[Math.abs(h) % DAY_GIFS.length];
+// Shuffle all 14 GIFs per 2-week period, then split: week 1 gets first 7, week 2 gets second 7
+function gifsForWeek(wsDate) {
+  // Compute which 2-week period this falls in (epoch-based)
+  const epoch = new Date('2024-01-01').getTime();
+  const weekNum = Math.floor((wsDate.getTime() - epoch) / (7 * 864e5));
+  const periodNum = Math.floor(weekNum / 2);
+  const isSecondWeek = weekNum % 2;
+
+  // Seed from period number
+  let h = periodNum * 2654435761;
+  const pool = [...DAY_GIFS];
+  for (let i = pool.length - 1; i > 0; i--) {
+    h = (h * 1103515245 + 12345) | 0;
+    const j = Math.abs(h) % (i + 1);
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(isSecondWeek ? 7 : 0, isSecondWeek ? 14 : 7);
 }
 
 function renderWeek() {
@@ -605,6 +617,8 @@ function renderWeek() {
     ? [...Array.from({length:7-todayIdx},(_,i)=>todayIdx+i), ...Array.from({length:todayIdx},(_,i)=>i)]
     : Array.from({length:7},(_,i)=>i);
 
+  const weekGifs = gifsForWeek(ws);
+
   for(const i of order){
     const date=addD(ws,i), key=dk(date), isTod=key===today;
     const isPast = weekOffset===0 && i<todayIdx;
@@ -617,7 +631,7 @@ function renderWeek() {
           <button class="day-add-btn" data-daykey="${key}">+ Add Task</button>
         </div>
       </div>
-      <img class="day-gif" src="https://media.giphy.com/media/${gifForDay(key)}/giphy.gif" alt="daily gif" loading="lazy">
+      <img class="day-gif" src="https://media.giphy.com/media/${weekGifs[i]}/giphy.gif" alt="daily gif" loading="lazy">
       <div class="day-body" id="body-${key}"></div>
       <div class="day-footer">
         <div class="progress-bar-wrap"><div class="progress-bar" id="prog-${key}" style="width:0%"></div></div>
