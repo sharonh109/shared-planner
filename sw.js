@@ -1,4 +1,4 @@
-const CACHE = 'weekly-planner-v3';
+const CACHE = 'weekly-planner-v4';
 
 self.addEventListener('install', e => {
   e.waitUntil(
